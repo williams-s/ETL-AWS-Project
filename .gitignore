@@ -1,8 +1,5 @@
-.terraform
-data_raw
-"terraform.tfstate*" 
-".terraform.lock.hcl" 
-".terraform/" 
-terraform.tfstate*
-.terraform.lock.hcl
-.terraform/
+data_raw/
+*.zip
+*.parquet
+__pycache__/
+*.pyc

@@ -39,6 +39,5 @@ def download_netflix_data():
     
     print("Dataset Netflix telechargé !")
         
-
 if __name__ == "__main__":
     download_netflix_data()
