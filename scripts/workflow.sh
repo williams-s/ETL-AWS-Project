@@ -1,5 +1,8 @@
 #!/bin/bash
 
+pip install -r dataset/requirements.txt
+python3 dataset/download_dataset.py
+
 cd ../terraform
 terraform apply -auto-approve
 
