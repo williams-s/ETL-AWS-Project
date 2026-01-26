@@ -1,31 +1,19 @@
-import sys
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql import Row
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, to_date
-from pyspark.sql.types import LongType
-from awsglue.utils import getResolvedOptions
-
-print("Starting python job...")
-
-args = getResolvedOptions(sys.argv, [
-    'JOB_NAME',
-    'input_path',
-    'output_path'
-])
+from pyspark.sql.functions import col, to_date 
+from pyspark.sql.types import LongType 
 
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
-job.init(args['JOB_NAME'], args)
+job.init("netflix_transform_folder", {})
 
-
-input_path = args['input_path']   # "s3://netflix-analytics-williams2/raw/netflix/*"
-output_path = args['output_path'] # "s3://netflix-analytics-williams2/processed/netflix/"
-
+input_path = "s3://netflix-analytics-williams2/raw/netflix/*" 
+output_path = "s3://netflix-analytics-williams2/processed/netflix/"  
 
 rdd = sc.textFile(input_path)
 
@@ -58,11 +46,6 @@ df = df.select(
     to_date(col('Date'), 'yyyy-MM-dd').alias('date')
 )
 
-
 df.write.mode('overwrite').parquet(output_path)
 
-print(f"Data written to: {output_path}")
-
 job.commit()
-
-print("Job commited !")
