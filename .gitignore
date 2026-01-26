@@ -1,2 +1,8 @@
 .terraform
 data_raw
+"terraform.tfstate*" 
+".terraform.lock.hcl" 
+".terraform/" 
+terraform.tfstate*
+.terraform.lock.hcl
+.terraform/
