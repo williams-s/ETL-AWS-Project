@@ -2,7 +2,7 @@ resource "aws_glue_job" "netflix_job" {
   name     = "netflix-transform-job"
   role_arn = "arn:aws:iam::362838062282:role/LabRole"
 
-  glue_version = "4.0"
+  glue_version = "5.0"
 
   command {
     name            = "glueetl"
