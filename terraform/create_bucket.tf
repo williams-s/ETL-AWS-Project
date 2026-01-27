@@ -10,6 +10,18 @@ resource "aws_s3_bucket" "netflix_data" {
   }
 }
 
+resource "aws_s3_object" "folders" {
+  for_each = {
+    movies  = "processed/movies/"
+    ratings = "processed/ratings/"
+  }
+  
+  bucket = "netflix-analytics-williams2"
+  key    = each.value
+  content = ""
+}
+
 resource "aws_glue_catalog_database" "netflix_db" {
   name = "netflix_database"
 }
+
