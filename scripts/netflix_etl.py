@@ -2,22 +2,27 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql import Row
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, to_date 
-from pyspark.sql.types import LongType 
+from pyspark.sql.functions import col, to_date
+from pyspark.sql.types import LongType, StringType
 
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
-job.init("netflix_transform_folder", {})
+job.init("netflix-transform-job", {})
 
-input_path = "s3://netflix-analytics-williams2/raw/netflix/*" 
-output_path = "s3://netflix-analytics-williams2/processed/netflix/"  
 
-rdd = sc.textFile(input_path)
+rating_input_path = "s3://netflix-analytics-williams2/raw/ratings/*.txt"
+movie_input_path  = "s3://netflix-analytics-williams2/raw/movies/*.csv"
 
-def parse_lines(lines):
+rating_output_path = "s3://netflix-analytics-williams2/processed/ratings/"
+movie_output_path  = "s3://netflix-analytics-williams2/processed/movies/"
+
+print("Processing ratings files...")
+rating_rdd = sc.textFile(rating_input_path)
+
+def parse_rating_lines(lines):
+    """Parse le format Netflix ratings"""
     current_movie_id = None
     result = []
     for line in lines:
@@ -29,23 +34,42 @@ def parse_lines(lines):
             if len(parts) == 3 and current_movie_id:
                 customer_id, rating, date = parts
                 result.append(Row(
-                    MovieID=current_movie_id,
-                    CustomerID=int(customer_id),
-                    Rating=int(rating),
-                    Date=date
+                    movie_id=current_movie_id,
+                    customer_id=int(customer_id),
+                    rating=int(rating),
+                    date=date
                 ))
     return result
 
-rows_rdd = rdd.mapPartitions(lambda partition: parse_lines(partition))
-df = spark.createDataFrame(rows_rdd)
+rating_rows_rdd = rating_rdd.mapPartitions(parse_rating_lines)
+rating_df = spark.createDataFrame(rating_rows_rdd)
 
-df = df.select(
-    col('MovieID').cast(LongType()).alias('movie_id'),
-    col('CustomerID').alias('customer_id'),
-    col('Rating').alias('rating'),
-    to_date(col('Date'), 'yyyy-MM-dd').alias('date')
+
+rating_df = rating_df.select(
+    col('movie_id').cast(LongType()),
+    col('customer_id').cast(LongType()),
+    col('rating').cast(LongType()),
+    to_date(col('date'), 'yyyy-MM-dd').alias('rating_date')
 )
 
-df.write.mode('overwrite').parquet(output_path)
 
+print("\nProcessing movies files...")
+movie_df = spark.read.csv(
+    movie_input_path,
+    inferSchema=True
+)
+
+movie_df = movie_df.select(
+    col('_c0').alias('movie_id').cast(LongType()),
+    col('_c1').alias('year').cast(LongType()),
+    col('_c2').alias('title').cast(StringType()),
+)
+
+rating_df.write.mode('overwrite').parquet(rating_output_path)
+movie_df.write.mode('overwrite').parquet(movie_output_path)
+
+joined_df = rating_df.join(movie_df, on='movie_id', how='left')
+
+joined_output_path = "s3://netflix-analytics-williams2/processed/joined/"
+joined_df.write.mode('overwrite').parquet(joined_output_path)
 job.commit()
