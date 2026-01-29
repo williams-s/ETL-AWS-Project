@@ -43,5 +43,5 @@ La prévision de fin de mois montre une augmentation significative des couts. (+
 
 Nous pouvons conclure que l'entretien de notre pipeline est très couteux notammenent à cause du traitement des données provenant des fichiers de notre dataset 
 
-![alt text](image.png)
+![alt text](couts.png)
 
