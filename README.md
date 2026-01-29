@@ -30,3 +30,16 @@ Athena est utilisé pour effectuer des requêtes sur les données transformées,
 Le crawlers Glue assurent la synchronisation entre S3 et Athena :
 
 ---
+
+### 3. Analyse des coûts 
+
+Glue qui domine largement les coûts (environ 89 %), cela est lié au fait que notre ETL traite sur plus de 100 millions de lignes. 
+
+CloudWatch est le deuxième poste (environ 8,2 %) lié à la surveillance des jobs Glue.
+
+Les autres services sont  (Athena, S3, Kinesis < 3 % au total).
+
+La prévision de fin de mois (+56,7 %) suggère une augmentation significative de l'utilisation. 
+
+![alt text](image.png)
+
