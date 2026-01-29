@@ -35,11 +35,13 @@ Le crawlers Glue assurent la synchronisation entre S3 et Athena :
 
 Glue qui domine largement les coûts (environ 89 %), cela est lié au fait que notre ETL traite sur plus de 100 millions de lignes. 
 
-CloudWatch est le deuxième poste (environ 8,2 %) lié à la surveillance des jobs Glue.
+CloudWatch est le deuxième (environ 8 %) et est lié à la surveillance des jobs Glue.
 
-Les autres services sont  (Athena, S3, Kinesis < 3 % au total).
+Les autres services sont (Athena, S3, Kinesis < 3 % au total).
 
-La prévision de fin de mois (+56,7 %) suggère une augmentation significative de l'utilisation. 
+La prévision de fin de mois montre une augmentation significative des couts. (+56,7 %)
+
+Nous pouvons conclure que l'entretien de notre pipeline est très couteux notammenent à cause du traitement des données provenant des fichiers de notre dataset 
 
 ![alt text](image.png)
 
